@@ -1,6 +1,7 @@
 ﻿using ConsoleApp1.Entities;
 using System;
 using System.Linq;
+using System.Threading.Tasks;
 
 public class ProductService
 {
@@ -13,17 +14,12 @@ public class ProductService
         _categoryRepository = categoryRepository;
     }
 
-    public ProductService()
-    {
-    }
-
-    public bool AddProduct(string name, string description, decimal price, int quantity, string categoryName)
+    public async Task<bool> AddProductAsync(string name, string description, decimal price, int stockQuantity, string categoryName)
     {
         var category = _categoryRepository.Find(c => c.Name.ToLower() == categoryName.ToLower()).FirstOrDefault();
         if (category == null)
         {
-           
-            return false; 
+            return false; // Category not found
         }
 
         var product = new ProductEntity
@@ -31,19 +27,19 @@ public class ProductService
             Name = name,
             Description = description,
             Price = price,
-            StockQuantity = quantity,
+            StockQuantity = stockQuantity, // Corrected from 'quantity' to 'stockQuantity'
             CategoryId = category.CategoryId
         };
 
-        _productRepository.Add(product);
-        _productRepository.SaveChanges();
+        await _productRepository.AddAsync(product);
+        await _productRepository.SaveChangesAsync();
 
         return true; // Product added successfully
     }
 
-    public bool UpdateProduct(int id, string name, string description, decimal? price, int? quantity)
+    public async Task<bool> UpdateProductAsync(int productId, string? name, string? description, decimal? price, int? stockQuantity)
     {
-        var product = _productRepository.GetById(id);
+        var product = await _productRepository.GetByIdAsync(productId); // Corrected from 'id' to 'productId'
         if (product == null)
         {
             return false; // Product not found
@@ -52,42 +48,32 @@ public class ProductService
         if (!string.IsNullOrWhiteSpace(name)) product.Name = name;
         if (!string.IsNullOrWhiteSpace(description)) product.Description = description;
         if (price.HasValue) product.Price = price.Value;
-        if (quantity.HasValue) product.StockQuantity = quantity.Value;
+        if (stockQuantity.HasValue) product.StockQuantity = stockQuantity.Value; // Corrected from 'quantity'
 
-        _productRepository.SaveChanges();
+        await _productRepository.SaveChangesAsync();
         return true; // Product updated successfully
     }
 
-    public ProductEntity ViewProduct(int id)
+    public async Task<ProductEntity?> ViewProductAsync(int productId)
     {
-        return _productRepository.GetAllIncluding(p => p.Category).FirstOrDefault(p => p.ProductId == id);
+        return await _productRepository.GetAllIncluding(p => p.Category).FirstOrDefaultAsync(p => p.ProductId == productId); // Corrected 'id' to 'productId'
     }
 
-    public bool DeleteProduct(int id)
+    public async Task<bool> DeleteProductAsync(int productId)
     {
-        var product = _productRepository.GetById(id);
+        var product = await _productRepository.GetByIdAsync(productId); // Corrected from 'id' to 'productId'
         if (product == null)
         {
             return false; // Product not found
         }
 
         _productRepository.Remove(product);
-        _productRepository.SaveChanges();
+        await _productRepository.SaveChangesAsync();
         return true; // Product deleted successfully
     }
 
-    public IQueryable<ProductEntity> ViewAllProducts()
+    public async Task<IEnumerable<ProductEntity>> ViewAllProductsAsync()
     {
-        var result = _productRepository.GetAllIncluding(p => p.Category).AsQueryable();
-        return result;
-    }
-
-    // Assuming CreateCategory is a requirement for your business logic
-    public CategoryEntity CreateCategory(string name, string description)
-    {
-        var newCategory = new CategoryEntity { Name = name, Description = description };
-        _categoryRepository.Add(newCategory);
-        _categoryRepository.SaveChanges();
-        return newCategory; // New category created successfully
+        return await _productRepository.GetAllIncluding(p => p.Category).ToListAsync();
     }
 }
