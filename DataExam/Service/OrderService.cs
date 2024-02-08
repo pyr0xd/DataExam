@@ -1,4 +1,6 @@
 ﻿using ConsoleApp1.Entities;
+using System.Collections.Generic;
+using System.Threading.Tasks;
 
 public class OrderService
 {
@@ -14,9 +16,9 @@ public class OrderService
         return await _orderRepo.GetAllAsync();
     }
 
-    public async Task<OrderEntity> GetOrderByIdAsync(int id)
+    public async Task<OrderEntity> GetOrderByIdAsync(int orderId)
     {
-        return await _orderRepo.GetByIdAsync(id);
+        return await _orderRepo.GetByIdAsync(orderId);
     }
 
     public async Task<OrderEntity> CreateOrderAsync(OrderEntity order)
@@ -30,8 +32,8 @@ public class OrderService
         await _orderRepo.UpdateAsync(order);
     }
 
-    public async Task DeleteOrderAsync(int id)
+    public async Task DeleteOrderAsync(int orderId)
     {
-        await _orderRepo.DeleteAsync(id);
+        await _orderRepo.DeleteAsync(orderId);
     }
 }

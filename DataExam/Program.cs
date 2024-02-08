@@ -12,6 +12,9 @@ namespace CandyStoreConsoleApp
     {
         static void Main(string[] args)
         {
+            Repo<OrderEntity> orderRepo = new Repo<OrderEntity>(); // Ensure you have a concrete implementation
+            OrderService orderService = new OrderService(orderRepo);
+            OrderUI orderUI = new OrderUI(orderService);
             CustomerService customerService =new CustomerService(new Repo<CustomerEntity>());
             CustomerUI customerUI = new CustomerUI(customerService);
             ProductService productService = new ProductService();
@@ -21,10 +24,10 @@ namespace CandyStoreConsoleApp
 
             ProductUI productUI = new ProductUI(productService, categoryUI);
 
-            DisplayMainMenu(productUI, categoryUI, cartUI, customerUI );
+            DisplayMainMenu(productUI, categoryUI, cartUI, customerUI, orderUI );
         }
 
-        private static void DisplayMainMenu(ProductUI productUI, CategoryUI categoryUI ,CartUI cartUI, CustomerUI customerUI)
+        private static void DisplayMainMenu(ProductUI productUI, CategoryUI categoryUI ,CartUI cartUI, CustomerUI customerUI, OrderUI orderUI)
         {
             bool exit = false;
             while (!exit)
@@ -34,7 +37,8 @@ namespace CandyStoreConsoleApp
                 Console.WriteLine("2. Category Management"); // Assuming you have similar functionality for categories
                 Console.WriteLine("3. Cart Managment");
                 Console.WriteLine("4. Customer Managment");
-                Console.WriteLine("5. Exit");
+                Console.WriteLine("5. order managment");
+                Console.WriteLine("6. exit");
 
 
                 var choice = Console.ReadLine();
@@ -55,6 +59,9 @@ namespace CandyStoreConsoleApp
                         customerUI.DisplayCustomerManagementMenu();
                         break; 
                     case "5":
+                        orderUI.DisplayOrderManagementMenuAsync();
+                        break;
+                    case "6":
                         exit = true;
                         break;
                     
