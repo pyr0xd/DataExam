@@ -11,9 +11,7 @@ public class Repo<T> : IRepo<T> where T : class
         _context = context;
     }
 
-    public Repo()
-    {
-    }
+    
 
     public IEnumerable<T> GetAllIncluding(params Expression<Func<T, object>>[] includeProperties)
     {
