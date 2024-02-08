@@ -12,56 +12,59 @@ namespace CandyStoreConsoleApp
     {
         static void Main(string[] args)
         {
-            using var context = new CandyStoreContext();
-            var productRepository = new Repo<ProductEntity>(context);
-            var categoryRepository = new Repo<CategoryEntity>(context);
+            ProductService productService = new ProductService();
+            CategoryUI categoryUI = new CategoryUI();
+            CartService cartService = new CartService(new Repo<CartEntity>()); // Create an instance of CartService
+            CartUI cartUI = new CartUI(cartService); // Pass cartService to the constructor
 
+            ProductUI productUI = new ProductUI(productService, categoryUI);
 
-            var productService = new ProductService(productRepository, categoryRepository);
-            var categoryService = new CategoryService(categoryRepository);
+            DisplayMainMenu(productUI, categoryUI,cartUI );
+        }
 
-            InitializeDatabase();
-
-            while (true)
+        private static void DisplayMainMenu(ProductUI productUI, CategoryUI categoryUI ,CartUI cartUI)
+        {
+            bool exit = false;
+            while (!exit)
             {
-                ConsoleUI.DisplayMainMenu();
-                var option = Console.ReadLine();
+                Console.WriteLine("Main Menu");
+                Console.WriteLine("1. Product Management");
+                Console.WriteLine("2. Category Management"); // Assuming you have similar functionality for categories
+                Console.WriteLine("3. Exit");
+
+                var choice = Console.ReadLine();
                 Console.Clear();
 
-                switch (option)
+                switch (choice)
                 {
                     case "1":
-                        productService.AddProduct();
+                        productUI.DisplayProductManagementMenu();
                         break;
                     case "2":
-                        productService.ViewProduct();
+                        categoryUI.DisplayCategoryManagementMenu();
                         break;
                     case "3":
-                        productService.UpdateProduct();
+                        cartUI.DisplayCartManagementMenu();
                         break;
                     case "4":
-                        productService.DeleteProduct();
-                        break;
+                       
+                        break; 
                     case "5":
-                        productService.ViewAllProducts();
+                        exit = true;
                         break;
-                    case "6":
-                        categoryService.CreateCategory();
-                        break;
-                    case "7":
-                        return;
+                    
                     default:
-                        Console.WriteLine("Invalid option, try again.");
+                        Console.WriteLine("Invalid option, please try again.");
                         break;
                 }
             }
         }
+
 
         static void InitializeDatabase()
         {
 
         }
     }
-
-
 }
+
